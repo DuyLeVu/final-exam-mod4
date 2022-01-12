@@ -45,8 +45,8 @@ function showAll() {
 }
 
 function showFormAdd() {
-    let form = `<form>
-    <fieldset>
+    let form = `
+        <form>
         <legend>Thêm thành phố</legend>
         <table>
             <tr>
@@ -147,6 +147,96 @@ function showDetails(id) {
                 '<button class="btn btn-danger" onclick="deleteById(' + data.id + ')">Xóa</button>';
             html += `</div></div>`;
             $("#content").html(html);
+        }
+    })
+}
+
+function showEditCity(id) {
+    $.ajax({
+        type: "GET",
+        url: "http://localhost:8080/api/cities/" + id,
+        success: function (data) {
+            console.log(data)
+            let form = `
+             <form>
+ 
+            <legend>Chỉnh sửa thành phố` + data.name + `</legend> 
+            <table>
+                <tr>
+                    <td>Tên:</td>
+                    <td><input type="text" name="name" id="name" value="` + data.name + `"></td>
+                </tr>
+                <tr>
+                    <td>Quốc gia:</td>
+                    <td>
+                        <select id="nationId" name="nationId">
+                             <option>Select</option>`;
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/nations/",
+                success: function (listNation) {
+                    console.log(listNation)
+                    for (let i = 0; i < listNation.length; i++) {
+                        form += `<option value="${listNation[i].id}">${listNation[i].name}</option>`
+                    }
+                    form += `</select>
+                            <tr>
+                                <td>Diện tích:</td>
+                                <td><input type="text" name="name" id="area" value="` + data.area + `"></td>
+                            </tr>
+                             <tr>
+                                <td>Dân số:</td>
+                                <td><input type="text" name="name" id="population" value="` + data.population + `"></td>
+                             </tr>    
+                             <tr>
+                                <td>GDP:</td>
+                                <td><input type="text" name="name" id="gdp" value="` + data.gdp + `"></td>
+                             </tr> 
+                             <tr>
+                                <td>Giới thiệu:</td>
+                                <td><input type="text-area" name="name" id="description" value="` + data.description + `"></td>
+                            </tr> 
+                            </table>
+                            <button class="btn btn-success" onclick="updateCity(` + data.id + `)"">Cập nhật</button>
+                            <span> | </span>
+                             <button class="btn btn-danger" onclick="loadHomeContent()">Thoát</button>`;
+                    $("#content").html(form);
+                }
+            })
+        }
+    })
+}
+function updateCity(id){
+    let name = $("#name").val();
+    let nationId = $("#nationId").val();
+    let area = $("#area").val();
+    let population = $("#population").val();
+    let gdp = $("#gdp").val();
+    let description = $("#description").val();
+    let citi = {
+        name: name,
+        area: area,
+        population: population,
+        gdp: gdp,
+        description: description,
+        nation: {
+            id: nationId
+        }
+    }
+    console.log(citi)
+    $.ajax({
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        type: "PUT",
+        url: "http://localhost:8080/api/cities/" + id,
+        data: JSON.stringify(citi),
+        success: function () {
+            loadHomeContent()
+        },
+        error: function (error) {
+            alert("Lỗi server")
         }
     })
 }
