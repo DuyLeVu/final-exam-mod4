@@ -240,3 +240,20 @@ function updateCity(id){
         }
     })
 }
+function deleteById(id) {
+    if (confirm("Bạn có thật sự muốn xoá?")) {
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "DELETE",
+            url: "http://localhost:8080/api/cities/" + id,
+            success: function () {
+                loadHomeContent();
+            },
+            error: function (error) {
+            }
+        });
+    }
+}
